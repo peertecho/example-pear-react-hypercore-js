@@ -2,7 +2,6 @@
 /** @typedef {import('pear-interface')} */
 
 import path from 'path'
-import process from 'process'
 import Hyperswarm from 'hyperswarm'
 import Hypercore from 'hypercore'
 import b4a from 'b4a'
@@ -18,14 +17,12 @@ export async function createCoreWriter ({ name = 'writer' } = {}) {
   console.log('starting writer', name)
   const core = new Hypercore(path.join(Pear.config.storage, name))
   await core.ready()
-  
-  process.stdin.on('data', (data) => core.append(data))
 
   console.log('joining', b4a.toString(core.discoveryKey, 'hex'))
   swarm.join(core.discoveryKey)
   swarm.on('connection', conn => core.replicate(conn))
 
-  return b4a.toString(core.key, 'hex')
+  return core
 }
 
 export async function createCoreReader ({ name = 'reader', coreKeyWriter, onData } = {}) {
@@ -33,17 +30,21 @@ export async function createCoreReader ({ name = 'reader', coreKeyWriter, onData
   const core = new Hypercore(path.join(Pear.config.storage, name), coreKeyWriter)
   await core.ready()
 
+  const foundPeers = core.findingPeers()
+
   console.log('joining', b4a.toString(core.discoveryKey, 'hex'))
   swarm.join(core.discoveryKey)
   swarm.on('connection', conn => core.replicate(conn))
-  
-  const foundPeers = core.findingPeers()
+
   swarm.flush().then(() => foundPeers())
 
+  console.log('updating')
   await core.update()
 
+  console.log('reading', core.length)
   let position = core.length
-  for await (const block of core.createReadStream({ start: core.length, live: true })) {
+  core.createReadStream({ start: core.length, live: true }).on('data', (block) => {
+    position += 1
     onData({ position, block })
-  }
+  })
 }

@@ -33,7 +33,7 @@
   "pear": {
     "gui": {
       "backgroundColor": "#1F2430",
-      "height": "800",
+      "height": "600",
       "width": "800"
     }
   }
