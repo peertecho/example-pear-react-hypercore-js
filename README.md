@@ -1,7 +1,7 @@
 # Overview
-- Example of Pear desktop app with Javascript + React + Hyperswarm
+- Example of Pear desktop app with Javascript + React + Hyperswarm + Hypercore
 - Multiple app instances can run concurrently (same machine or different machines) 
-to connect and send message to each other with Hyperswarm streams
+to connect and replicate messages
 
 # Getting started
 ## Prod mode
@@ -20,10 +20,10 @@ npm run dev
 # Run
 - Open two apps, e.g. run `npm run dev` in two terminals
 - On the first app, 
-  - click Create topic
-  - wait for topic created with a topic key
+  - click Start writer
+  - wait for core created with a core key
 - On the second app
-  - copy the above topic key into the Join topic input box
-  - click Join topic
-  - wait for topic joined
-- On any app, send a message in an app, the other app will receive it
+  - copy the above core key into the reader input box
+  - click Start reader
+  - wait for started
+- Go back to first app, send a message, the second app will receive it
