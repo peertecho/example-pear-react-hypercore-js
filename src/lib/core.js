@@ -30,12 +30,10 @@ export async function createCoreReader ({ name = 'reader', coreKeyWriter, onData
   const core = new Hypercore(path.join(Pear.config.storage, name), coreKeyWriter)
   await core.ready()
 
-  const foundPeers = core.findingPeers()
-
   console.log('joining', b4a.toString(core.discoveryKey, 'hex'))
+  const foundPeers = core.findingPeers()
   swarm.join(core.discoveryKey)
   swarm.on('connection', conn => core.replicate(conn))
-
   swarm.flush().then(() => foundPeers())
 
   console.log('updating')
