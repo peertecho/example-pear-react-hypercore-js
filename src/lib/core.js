@@ -33,8 +33,9 @@ export async function createCoreReader ({ name = 'reader', coreKeyWriter, onData
   await core.ready()
   swarm.on('connection', conn => core.replicate(conn))
 
+  const done = core.findingPeers()
   swarm.join(core.discoveryKey)
-  swarm.flush()
+  swarm.flush().then(done, done)
 
   await core.update()
 
