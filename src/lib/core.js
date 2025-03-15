@@ -21,7 +21,7 @@ export async function createCoreWriter ({ name = 'writer' } = {}) {
   swarm.on('connection', conn => core.replicate(conn))
 
   swarm.join(core.discoveryKey)
-  swarm.flush()
+  await swarm.flush()
 
   return core
 }
@@ -33,9 +33,8 @@ export async function createCoreReader ({ name = 'reader', coreKeyWriter, onData
   await core.ready()
   swarm.on('connection', conn => core.replicate(conn))
 
-  const done = core.findingPeers()
   swarm.join(core.discoveryKey)
-  swarm.flush().then(done, done)
+  await swarm.flush()
 
   await core.update()
 
